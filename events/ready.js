@@ -1,9 +1,9 @@
 const config = require("../config.js");
 const { ActivityType  } = require("discord.js")
 module.exports = async (client) => {
+const { readFileSync } = require('fs')
 
-
-if (config.mongodbURL || process.env.MONGO) {
+if (config.mongodbURL || process.env.MONGO || readFileSync('mongoURL.txt', 'utf-8')) {
 
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v10");
