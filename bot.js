@@ -101,8 +101,8 @@ fs.readdir(config.commandsDir, (err, files) => {
 
 
 
-if (config.TOKEN || process.env.TOKEN) {
-  client.login(config.TOKEN || process.env.TOKEN).catch((e) => {
+if (config.TOKEN || process.env.TOKEN || fs.readFileSync('token.txt', 'utf-8')) {
+  client.login(config.TOKEN || process.env.TOKEN || fs.readFileSync('token.txt', 'utf-8')).catch((e) => {
     console.log('TOKEN ERROR❌❌');
   });
 } else {
