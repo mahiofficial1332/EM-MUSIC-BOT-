@@ -14,16 +14,16 @@ require("./bot.js")
 }
 /*
 
-  ██████╗░████████╗██╗░░██╗           
-  ██╔══██╗╚══██╔══╝╚██╗██╔╝          
-  ██████╔╝░░░██║░░░░╚███╔╝░          
-  ██╔══██╗░░░██║░░░░██╔██╗░          
-  ██║░░██║░░░██║░░░██╔╝╚██╗          
-  ╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚═╝          
+███████╗███╗░░░███╗
+██╔════╝████╗░████║
+█████╗░░██╔████╔██║
+██╔══╝░░██║╚██╔╝██║
+███████╗██║░╚═╝░██║
+╚══════╝╚═╝░░░░░╚═╝
 
    
-   # MADE BY RTX!! FEEL FREE TO USE ANY PART OF CODE
+   # MADE BY EM OFFICIAL TEAM!! FEEL FREE TO USE ANY PART OF CODE
    ## FOR HELP CONTACT ME ON DISCORD
-   ## Contact    [ DISCORD SERVER :  https://discord.gg/FUEHs7RCqz ]
-   ## YT : https://www.youtube.com/channel/UCPbAvYWBgnYhliJa1BIrv0A
+   ## Contact    [ DISCORD SERVER :  https://discord.gg/tUrzH6J3dN ]
+   ## YT : https://youtube.com/@emofficial1234?si=6sSC9Oim-F1mF2CM
 */
