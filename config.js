@@ -1,8 +1,8 @@
 module.exports = {
   TOKEN: "",
-  ownerID: ["1153611682250227764", ""],
+  ownerID: ["1380183114109947924"], // Updated Owner ID
   botInvite: "",
-  supportServer: "https://discord.com/invite/qXM8jCsqtf",
+  supportServer: "https://discord.gg/tUrzH6J3dN", // Support Server
   mongodbURL: "mongodb+srv://shiva:shiva@musicbotyt.ouljywv.mongodb.net/?retryWrites=true&w=majority",
   status: 'NotBlackness',
   commandsDir: './commands',
@@ -10,10 +10,9 @@ module.exports = {
   embedColor: "#FFC0CB",
   errorLog: "",
 
-
   sponsor: {
     status: true,
-    url: "https://www.youtube.com/channel/UCPbAvYWBgnYhliJa1BIrv0A",
+    url: "https://www.youtube.com/@emofficial1234?si=6sSC9Oim-F1mF2CM", // YouTube
   },
 
   voteManager: {
@@ -44,10 +43,8 @@ module.exports = {
         status: true,
         cooldown: 10000000,
       },
-
     },
 
     maxVol: 150,
-
   }
 }
